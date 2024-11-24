@@ -15,7 +15,11 @@ class Home extends BaseController
 
     public function index(): string
     {
-        return view('welcome_message');
+        $data = array(
+            "content" => "Tu destino para reservas rápidas, seguras y con las mejores ofertas.",
+            "page" => view(__function__),
+        );
+        return view('page', $data);
     }
 
     public function home(): string
@@ -24,7 +28,32 @@ class Home extends BaseController
         $documents = $collection->find()->toArray();
         $rooms = array_map(fn($doc) => $doc->getArrayCopy(), $documents);
 
-        return view('home', ['rooms' => $rooms]);
+        $data = array(
+            "content" => "Encuentra la habitación perfecta para tu estadía",
+            "page" => view(__function__, ['rooms' => $rooms]),
+        );
+        return view('page', $data);
+    }
+
+    public function booking(): string
+    {
+        $collection = $this->mongo->getCollection('room');
+        $documents = $collection->find(['available' => true])->toArray();
+        $rooms = array_map(fn($doc) => $doc->getArrayCopy(), $documents);
+        $data = array(
+            "content" => "Completa el formulario para confirmar tu reserva.",
+            "page" => view(__function__, ['rooms' => $rooms]),
+        );
+        return view('page', $data);
+    }
+
+    public function contact(): string
+    {
+        $data = array(
+            "content" => "Estamos aquí para ayudarte. ¿Tienes dudas o comentarios? ¡Escríbenos!",
+            "page" => view(__function__),
+        );
+        return view('page', $data);
     }
 
 }

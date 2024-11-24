@@ -7,4 +7,6 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 $routes->get('/', 'Home::index');
-$routes->get('roomhub/home', 'Home::home');
+$routes->get('home', 'Home::home');
+$routes->get('booking', 'Home::booking');
+$routes->get('contact', 'Home::contact');

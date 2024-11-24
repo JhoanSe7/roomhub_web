@@ -4820,7 +4820,6 @@
         "react/child-process",
         "react/dns",
         "react/event-loop",
-        "react/promise",
         "react/socket",
         "react/stream",
         "sebastian/cli-parser",
