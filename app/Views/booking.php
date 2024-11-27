@@ -26,7 +26,7 @@
 
         <!-- Selección de Habitación -->
         <div class="mb-3">
-            <label for="room" class="form-label">Habitación Disponible</label>
+            <label for="room" class="form-label">Habitación Disponible <span class="text-orange">*</span></label>
             <select class="form-select" id="room" name="room" required>
                 <option value="" selected disabled>Selecciona una habitación</option>
                 <?php if (isset($rooms) && count($rooms) > 0): ?>
@@ -84,3 +84,22 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Mensajes -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="messageContent">
+                <!-- Aquí se mostrará el mensaje dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+

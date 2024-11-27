@@ -292,3 +292,8 @@ input[type="date"]:focus {
     border-color: #ff8303;
     box-shadow: none;
 }
+
+.spinner-border {
+    vertical-align: middle;
+    margin-right: 5px;
+}

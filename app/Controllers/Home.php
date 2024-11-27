@@ -66,7 +66,7 @@ class Home extends BaseController
             $mongoRoom = $this->mongo->getCollection('room');
             $mongoRoom->updateOne(
                 ['code' => $json->room],
-                ['$set' => ['available' => 0]]
+                ['$set' => ['available' => false]]
             );
             $room = $mongoRoom->findOne(['code' => $json->room]);
 
