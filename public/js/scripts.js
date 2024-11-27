@@ -1,6 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+    const BASE_URL = document.getElementById("base_url").value;
+    const confirmModal = new bootstrap.Modal(document.getElementById("reservationModal"));
+
     // Efectos de hover en tarjetas
     const cards = document.querySelectorAll(".room-card");
+
+    // informacion de reserva
+    const fullNameInput = document.getElementById("fullName");
+    const checkInDateInput = document.getElementById("checkInDate");
+    const checkOutDateInput = document.getElementById("checkOutDate");
+    const roomSelect = document.getElementById("room");
+    const additionalInfo = document.getElementById("additionalInfo");
+
+    const reservationButton = document.getElementById("reservationBtn");
+    const confirmButton = document.getElementById("confirmReservation");
+
+    // Referencias a los campos del modal
+    const modalFullName = document.getElementById("modalFullName");
+    const modalRoomName = document.getElementById("modalRoomName");
+    const modalCheckInDate = document.getElementById("modalCheckInDate");
+    const modalCheckOutDate = document.getElementById("modalCheckOutDate");
+    const modalRoomPrice = document.getElementById("modalRoomPrice");
+
+    const roomInfo = document.getElementById("roomInfo");
+
+    const messageModal = new bootstrap.Modal(document.getElementById("messageModal"));
+    const messageTitle = document.getElementById("messageModalLabel");
+    const messageContent = document.getElementById("messageContent");
 
     cards.forEach((card) => {
         card.addEventListener("mouseenter", () => {
@@ -13,9 +40,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+    // Validar Fecha de Entrada (No puede ser anterior a hoy)
+    checkInDateInput.addEventListener("change", () => {
+        const today = new Date();
+        const selectedDate = new Date(checkInDateInput.value);
+
+        if (selectedDate < today.setHours(0, 0, 0, 0)) {
+            showMessage(
+                "Verifica los campos",
+                "La fecha de entrada no puede ser anterior a la fecha actual.",
+                "error",
+            );
+            checkInDateInput.value = ""; // Resetea el valor si es inválido
+        }
+    });
+
+    // Validar Fecha de Salida (Debe ser mayor a la fecha de entrada)
+    checkOutDateInput.addEventListener("change", () => {
+        const checkInDate = new Date(checkInDateInput.value);
+        const checkOutDate = new Date(checkOutDateInput.value);
+
+        if (checkOutDate <= checkInDate) {
+            showMessage(
+                "Verifica los campos",
+                "La fecha de salida debe ser mayor que la fecha de entrada.",
+                "error",
+            );
+            checkOutDateInput.value = ""; // Resetea el valor si es inválido
+        }
+    });
+
+
 // Cambiar el copy según la selección de la habitación
-    document.getElementById("room").addEventListener("change", function () {
-        const roomInfo = document.getElementById("roomInfo");
+    roomSelect.addEventListener("change", function () {
+
         if (this.value) {
             roomInfo.textContent = "* Esta habitación no incluye servicio de desayuno.";
         } else {
@@ -24,41 +82,79 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Validación básica del formulario antes de enviar
-    document.getElementById("reservationBtn").addEventListener("click", function () {
-        const fullName = document.getElementById("fullName").value.trim();
-        const checkInDate = document.getElementById("checkInDate").value;
+    reservationButton.addEventListener("click", function () {
+        const client = fullNameInput.value.trim();
+        const checkInDate = new Date(checkInDateInput.value);
+        const checkOutDate = new Date(checkOutDateInput.value);
         const selectedRoom = roomSelect.options[roomSelect.selectedIndex];
-        const roomName = selectedRoom.dataset.name;
+        const roomName = selectedRoom?.dataset.name;
 
-        if (!fullName || !checkInDate || !roomName) {
-            alert("Por favor, complete todos los campos obligatorios.");
-        } else {
-            setData();
-            const myModal = new bootstrap.Modal(document.getElementById("reservationModal"));
-            myModal.show();
+        if (!client) {
+            showMessage(
+                "Verifica los campos",
+                "Por favor, ingrese su nombre completo.",
+                "error",
+            );
+            return;
         }
+        if (!checkInDateInput.value) {
+            showMessage(
+                "Verifica los campos",
+                "Por favor, selecciona una fecha de entrada.",
+                "error",
+            );
+            return;
+        }
+        if (checkInDate < new Date().setHours(0, 0, 0, 0)) {
+            showMessage(
+                "Verifica los campos",
+                "La fecha de entrada no puede ser anterior a la fecha actual.",
+                "error",
+            );
+            return;
+        }
+        if (checkOutDateInput.value && checkOutDate <= checkInDate) {
+            showMessage(
+                "Verifica los campos",
+                "La fecha de salida debe ser mayor que la fecha de entrada.",
+                "error",
+            );
+            return;
+        }
+        if (!roomName) {
+            showMessage(
+                "Verifica los campos",
+                "Por favor, seleccione una habitación.",
+                "error",
+            );
+            return;
+        }
+
+        // Si no hay errores, configura el modal de confirmación y muéstralo
+        setData();
+        confirmModal.show();
+
     });
 
+    // Función para mostrar mensajes en el modal reutilizable
+    function showMessage(title, message, type) {
+        messageTitle.textContent = title;
+        messageContent.textContent = message;
 
-    // informacion de reserva
-    const confirmButton = document.getElementById("confirmReservation");
+        // Cambiar estilos según el tipo de mensaje
+        if (type === "error") {
+            messageTitle.className = "modal-title text-danger"; // Rojo para errores
+        } else if (type === "success") {
+            messageTitle.className = "modal-title text-success"; // Verde para éxitos
+        } else {
+            messageTitle.className = "modal-title text-light"; // Default
+        }
 
-    // Referencias a los campos del formulario
-    const fullNameInput = document.getElementById("fullName");
-    const checkInDateInput = document.getElementById("checkInDate");
-    const checkOutDateInput = document.getElementById("checkOutDate");
-    const roomSelect = document.getElementById("room");
-
-    // Referencias a los campos del modal
-    const modalFullName = document.getElementById("modalFullName");
-    const modalRoomName = document.getElementById("modalRoomName");
-    const modalCheckInDate = document.getElementById("modalCheckInDate");
-    const modalCheckOutDate = document.getElementById("modalCheckOutDate");
-    const modalRoomPrice = document.getElementById("modalRoomPrice");
+        messageModal.show();
+    }
 
     // Mostrar datos en el modal
     function setData() {
-
         // Obtener valores del formulario
         const fullName = fullNameInput.value.trim();
         const checkInDate = checkInDateInput.value;
@@ -71,44 +167,70 @@ document.addEventListener("DOMContentLoaded", () => {
         modalFullName.textContent = fullName;
         modalRoomName.textContent = roomName;
         modalCheckInDate.textContent = checkInDate;
-        modalRoomPrice.textContent = formatToCOP(roomPrice);
+        modalRoomPrice.textContent = "$ " + roomPrice + " COP";
 
         if (checkOutDate) {
             modalCheckOutDate.textContent = checkOutDate;
         } else {
             modalCheckOutDate.textContent = "No especificada";
         }
-    };
+    }
 
     // Enviar los datos al backend al confirmar
     confirmButton.addEventListener("click", () => {
+        // Deshabilitar el botón y mostrar spinner
+        confirmButton.disabled = true;
+        confirmButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Confirmando...`;
+
         const data = {
             fullName: fullNameInput.value.trim(),
             checkInDate: checkInDateInput.value,
             checkOutDate: checkOutDateInput.value || null,
             room: roomSelect.value,
+            description: additionalInfo.value.trim(),
         };
 
-        // Simular el envío al backend (Reemplazar con tu lógica real)
-        console.log("Enviando datos:", data);
-
         // Aquí puedes hacer un fetch o Axios POST al backend
-        // fetch('<?= base_url('crear') ?>', { method: 'POST', body: JSON.stringify(data) })
-        alert("Reserva confirmada. ¡Gracias por reservar con RoomHub!");
-        location.reload(); // Recargar la página después de confirmar
+        fetch(BASE_URL + 'create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Asegura que el servidor reciba JSON
+                'Accept': 'application/json'       // Indica que esperas una respuesta JSON
+            },
+            body: JSON.stringify(data),
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then((error) => {
+                    throw new Error(error.message || "Error desconocido.");
+                });
+            }
+            return response.json();
+        }).then((res) => {
+            // Manejar respuesta exitosa
+            console.log(res.data);
+            showMessage(
+                "Reserva Exitosa",
+                "Reserva creada exitosamente. ¡Gracias por reservar con RoomHub!",
+                "success",
+            );
+            console.log(`${res.message} ¡Gracias por reservar con RoomHub!`);
+        }).catch((error) => {
+            // Manejar errores
+            console.error("Error al crear la reserva:", error);
+            showMessage(
+                "Error en la Reserva",
+                "Error al crear la reserva. Por favor, inténtalo de nuevo más tarde.",
+                "error",
+            );
+        }).finally(() => {
+            // Rehabilitar el botón y ocultar el spinner
+            setTimeout(() => {
+                location.replace(BASE_URL + "home");
+            }, 5000);
+            confirmButton.disabled = false;
+            confirmButton.innerHTML = "Confirmar Reserva";
+            confirmModal.hide();
+        });
     });
 
 });
-
-// Actualizar el contador de huéspedes dinámicamente
-function updateGuestCount(value) {
-    document.getElementById("guestCount").textContent = value === "1" ? "1 huésped" : `${value} huéspedes`;
-}
-
-const formatToCOP = (value) => {
-    return new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        minimumFractionDigits: 0 // Ajusta a 0 para evitar decimales
-    }).format(value);
-};

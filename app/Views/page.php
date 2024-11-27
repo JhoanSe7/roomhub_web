@@ -63,7 +63,7 @@
         <a href="#" class="text-orange">Términos y condiciones</a>
     </p>
 </footer>
-
+<input type="hidden" id="base_url" value="<?= base_url() ?>">
 <script src="<?= base_url() ?>js/bootstrap.js" defer></script>
 <script src="<?= base_url() ?>js/scripts.js" defer></script>
 </body>
