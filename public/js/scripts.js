@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // informacion de reserva
+    const BASE_URL = document.getElementById("base_url").value;
+
     // Efectos de hover en tarjetas
     const cards = document.querySelectorAll(".room-card");
 
@@ -48,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkInDateInput = document.getElementById("checkInDate");
     const checkOutDateInput = document.getElementById("checkOutDate");
     const roomSelect = document.getElementById("room");
+    const additionalInfo = document.getElementById("additionalInfo");
 
     // Referencias a los campos del modal
     const modalFullName = document.getElementById("modalFullName");
@@ -71,14 +75,14 @@ document.addEventListener("DOMContentLoaded", () => {
         modalFullName.textContent = fullName;
         modalRoomName.textContent = roomName;
         modalCheckInDate.textContent = checkInDate;
-        modalRoomPrice.textContent = formatToCOP(roomPrice);
+        modalRoomPrice.textContent = "$ " + roomPrice + " COP";
 
         if (checkOutDate) {
             modalCheckOutDate.textContent = checkOutDate;
         } else {
             modalCheckOutDate.textContent = "No especificada";
         }
-    };
+    }
 
     // Enviar los datos al backend al confirmar
     confirmButton.addEventListener("click", () => {
@@ -87,15 +91,38 @@ document.addEventListener("DOMContentLoaded", () => {
             checkInDate: checkInDateInput.value,
             checkOutDate: checkOutDateInput.value || null,
             room: roomSelect.value,
+            description: additionalInfo.value.trim(),
         };
 
         // Simular el envío al backend (Reemplazar con tu lógica real)
         console.log("Enviando datos:", data);
 
         // Aquí puedes hacer un fetch o Axios POST al backend
-        // fetch('<?= base_url('crear') ?>', { method: 'POST', body: JSON.stringify(data) })
-        alert("Reserva confirmada. ¡Gracias por reservar con RoomHub!");
-        location.reload(); // Recargar la página después de confirmar
+        fetch(BASE_URL + 'create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Asegura que el servidor reciba JSON
+                'Accept': 'application/json'       // Indica que esperas una respuesta JSON
+            },
+            body: JSON.stringify(data),
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then((error) => {
+                    console.error(error.message || "Error desconocido al procesar la reserva.");
+                });
+            }
+            return response.json();
+        }).then((res) => {
+            // Manejar respuesta exitosa
+            console.log(res.data);
+            alert(`${res.message} ¡Gracias por reservar con RoomHub!`);
+            location.replace(BASE_URL + "home");
+        })
+            .catch((error) => {
+                // Manejar errores
+                console.error("Error al crear la reserva:", error);
+                alert("Error al crear la reserva. Por favor, inténtalo de nuevo más tarde.");
+            });
     });
 
 });

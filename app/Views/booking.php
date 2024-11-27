@@ -73,7 +73,7 @@
                 <p><strong>Fecha de Salida:</strong> <span id="modalCheckOutDate">No especificada</span></p>
                 <p class="text-orange fs-5"><strong>Valor de la Habitación:</strong> <span id="modalRoomPrice"></span>
                 </p>
-                <small class="text-muted d-block mt-3">* El pago total de la habitación deberá realizarse al momento de
+                <small class="d-block mt-3 text-white">* El pago total de la habitación deberá realizarse al momento de
                     hacer el check-in en el hotel.
                 </small>
             </div>
